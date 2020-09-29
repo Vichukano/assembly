@@ -9,21 +9,40 @@ section .data
   msglen equ $-msg
 
 section .text 
-  _start:
-          push qword [msg]
-          pop qword [buff]
+  _start  push dword [msg+4] ; add string to buff
+          push dword [msg]
+          pop dword [buff]
+          pop dword [buff+4]
+          ;push params for read function
+          push dword size
+          push dword buff+msglen ;addres after msg string
+          call read
+          ;push params for write function
+          push dword size 
+          push dword buff
+          call write
+          jmp exit
+
+  read:   push dword ebp
+          mov ebp, esp
           mov eax, 3
           mov ebx, 0
-          mov ecx, buff + msglen
-          mov edx, size
+          mov ecx, [ebp+8]
+          mov edx, [ebp+12]
           int 80h
+          pop dword ebp
+          ret
+
+  write:  push dword ebp 
+          mov ebp, esp
           mov eax, 4
           mov ebx, 1
-          mov ecx, buff
-          mov edx, size
+          mov ecx, [ebp+8]
+          mov edx, [ebp+12]
           int 80h
-          call exit
-
+          pop dword ebp
+          ret
+          
   exit:   mov eax, 1
           mov ebx, 0
           int 80h
