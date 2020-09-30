@@ -1,3 +1,5 @@
+; Read stering form standart input and
+; print it to standart output with 'Hello, ' prefix.
 global _start
 
 section .bss
